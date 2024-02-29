@@ -15,6 +15,7 @@
     <depend>message_filters</depend>
     <depend>Pangolin</depend>
     <depend>vision_msgs</depend>
+    <depend>image_transport</depend>
 
     <export>
         <build_type>ament_cmake</build_type>

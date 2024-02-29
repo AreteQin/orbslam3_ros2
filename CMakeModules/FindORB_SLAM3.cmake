@@ -29,7 +29,9 @@ find_library(DBoW2_LIBRARY NAMES DBoW2
 find_library(g2o_LIBRARY NAMES g2o
              PATHS ${ORB_SLAM3_ROOT_DIR}/Thirdparty/g2o/lib)
 
-
+## Find build-in Sophus
+#find_library(Sophus_LIBRARY NAMES sophus
+#             PATHS ${ORB_SLAM3_ROOT_DIR}/Thirdparty/Sophus/lib)
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set ORB_SLAM3_FOUND to TRUE
