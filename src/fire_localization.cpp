@@ -6,7 +6,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core/core.hpp>
-#include "vision_msgs/Detection2DArray.h"
+#include <vision_msgs/msg/detection2_d_array.hpp>
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <glog/logging.h>
@@ -14,8 +14,8 @@
 #include <geometry_msgs/msg/pose_array.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 
-#include "../../../include/System.h"
-#include "../../../include/Map.h"
+#include "System.h"
+#include "Map.h"
 
 using namespace std;
 

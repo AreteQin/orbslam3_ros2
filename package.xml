@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+    <name>ORB_SLAM3_foxy</name>
+    <version>1.0.0</version>
+    <description>ROS2 wrapper for ORB_SLAM3 library</description>
+    <maintainer email="q_qiaome@live.concordia.ca">Qiaomeng Qin</maintainer>
+    <license>TODO</license>
+    <author>Qiaomeng Qin</author>
+
+    <buildtool_depend>ament_cmake</buildtool_depend>
+
+    <depend>rclcpp</depend>
+    <depend>sensor_msgs</depend>
+    <depend>cv_bridge</depend>
+    <depend>message_filters</depend>
+    <depend>Pangolin</depend>
+    <depend>vision_msgs</depend>
+
+    <export>
+        <build_type>ament_cmake</build_type>
+    </export>
+</package>
