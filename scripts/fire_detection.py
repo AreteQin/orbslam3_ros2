@@ -6,6 +6,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from vision_msgs.msg import Detection2D, Detection2DArray
 import cv2
+import sys
+print("Python version: " + sys.version)
 import torch
 from ultralytics import YOLO
 import pathlib
@@ -25,7 +27,7 @@ class ImageListener(Node):
             '/bounding_boxes/fire_spots',
             10)
         self.bridge = CvBridge()
-        self.model = YOLO("/home/qin/m300_ws/src/forest_fire_geopositioning/scripts/YoloWeights/v8l.pt")
+        self.model = YOLO("/home/qin/Downloads/YoloWeights/v8l.pt")
         self.get_logger().info('Node has been initialized')
 
     def callback(self, image):
@@ -38,16 +40,16 @@ class ImageListener(Node):
                 boxes = result.boxes
                 for box in boxes:
                     x1, y1, x2, y2 = box.xyxy[0]
-                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 1)
+                    # x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 0, 255), 1)
 
                     ros_box = Detection2D()
                     ros_box.header = image.header
-                    ros_box.bbox.size_x = x2 - x1
-                    ros_box.bbox.size_y = y2 - y1
-                    ros_box.bbox.center.x = (x1 + x2) / 2
-                    ros_box.bbox.center.y = (y1 + y2) / 2
-                    ros_box.bbox.center.theta = 0
+                    ros_box.bbox.size_x = float(x2 - x1)
+                    ros_box.bbox.size_y = float(y2 - y1)
+                    ros_box.bbox.center.x = float((x1 + x2) / 2)
+                    ros_box.bbox.center.y = float((y1 + y2) / 2)
+                    ros_box.bbox.center.theta = float(0)
                     ros_boxes.detections.append(ros_box)
                 self.publisher.publish(ros_boxes)
                 self.get_logger().info(f"Number of boxes detected: {len(boxes)}")

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ORB_SLAM3_foxy)
+project(orb_slam3_foxy)
 
 # You should set the PYTHONPATH to your own python site-packages path
 set(ENV{PYTHONPATH} "/opt/ros/foxy/lib/python3.8/site-packages/")
@@ -50,7 +50,13 @@ ament_target_dependencies(fire_localization
         ORB_SLAM3
         Pangolin)
 
-install(TARGETS fire_localization
+install(TARGETS
+        fire_localization
+        DESTINATION lib/${PROJECT_NAME})
+
+# Install python scripts.
+install(PROGRAMS
+        scripts/fire_detection.py
         DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
