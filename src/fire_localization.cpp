@@ -89,6 +89,8 @@ int main(int argc, char **argv) {
     ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::MONOCULAR, true);
 
     auto node = rclcpp::Node::make_shared("fire_localization");
+    // set image_transport parameter to "compressed"
+    node->declare_parameter<std::string>("image_transport", "compressed");
 
     // message filter for images
     image_transport::ImageTransport it(node);

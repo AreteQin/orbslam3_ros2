@@ -16,6 +16,8 @@ import datetime
 class ImageListener(Node):
     def __init__(self):
         super().__init__('image_listener')
+        # declare image_transport parameter to "compressed"
+        self.declare_parameter('image_transport', 'compressed')
         self.subscription = self.create_subscription(
             Image,
             '/dji_osdk_ros/main_wide_RGB',
