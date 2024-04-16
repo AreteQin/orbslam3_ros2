@@ -22,6 +22,7 @@ find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(vision_msgs REQUIRED)
+find_package(Glog REQUIRED)
 
 find_package(Pangolin REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
@@ -50,11 +51,26 @@ ament_target_dependencies(fire_localization
         ORB_SLAM3
         Pangolin)
 
+add_executable(bounding_box_visualization
+        src/bounding_box_visualization.cpp
+)
+ament_target_dependencies(bounding_box_visualization
+        rclcpp
+        sensor_msgs
+        message_filters
+        vision_msgs
+        image_transport
+        cv_bridge)
+
 install(TARGETS
         fire_localization
+        bounding_box_visualization
         DESTINATION lib/${PROJECT_NAME})
+target_link_libraries(fire_localization
+        ${GLOG_LIBRARIES}
+)
 
-# Install python scripts.
+        # Install python scripts.
 install(PROGRAMS
         scripts/fire_detection.py
         DESTINATION lib/${PROJECT_NAME})

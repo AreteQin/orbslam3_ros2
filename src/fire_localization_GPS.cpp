@@ -13,6 +13,8 @@
 #include <image_transport/image_transport.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <sensor_msgs/msg/nav_sat_fix.hpp>
+#include <message_filters/sync_policies/approximate_time.h>
 
 #include "System.h"
 #include "Map.h"
@@ -24,7 +26,8 @@ ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
                    const std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseArray>> fire_spots_pub,
                    const std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseStamped>> camera_pose_pub,
                    const sensor_msgs::msg::Image::ConstSharedPtr &msg,
-                   const vision_msgs::msg::Detection2DArray::ConstSharedPtr &msg_fire_spot) {
+                   const vision_msgs::msg::Detection2DArray::ConstSharedPtr &msg_fire_spot,
+                   const sensor_msgs::msg::NavSatFix::ConstSharedPtr &msg_drone_GPS) {
     // Copy the ros image message to cv::Mat.
     cv_bridge::CvImageConstPtr cv_ptr;
     LOG(INFO) << "fire spots number: " << msg_fire_spot->detections.size();
@@ -44,6 +47,12 @@ ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
                                 box.bbox.size_x, box.bbox.size_y);
     }
 
+    // convert NavSatFix to Eigen::Vector3f
+    Eigen::Vector3f drone_GPS = Eigen::Vector3f(msg_drone_GPS->latitude,
+                                                msg_drone_GPS->longitude,
+                                                msg_drone_GPS->altitude);
+
+//    pSLAM->TrackMonocularAndFire(cv_ptr->image, cv_ptr->header.stamp.sec, fire_spots, drone_GPS);
     pSLAM->TrackMonocularAndFire(cv_ptr->image, cv_ptr->header.stamp.sec, fire_spots);
     ORB_SLAM3::Map *current_map = pSLAM->GetActiveMap();
 
@@ -98,6 +107,8 @@ int main(int argc, char **argv) {
     image_transport::ImageTransport it(node);
     message_filters::Subscriber<sensor_msgs::msg::Image> sub_image
             (node, "/dji_osdk_ros/main_wide_RGB");
+    message_filters::Subscriber<sensor_msgs::msg::NavSatFix> sub_drone_GPS
+            (node, "/dji_osdk_ros/gps_position");
     message_filters::Subscriber<vision_msgs::msg::Detection2DArray> sub_fire_spot;
     sub_fire_spot.subscribe(node, "/bounding_boxes/fire_spots");
 
@@ -110,15 +121,32 @@ int main(int argc, char **argv) {
             ("/position/camera_pose", 10);
 
     // Sync the subscribed data
-    message_filters::TimeSynchronizer<sensor_msgs::msg::Image,
-            vision_msgs::msg::Detection2DArray>
-            sync(sub_image, sub_fire_spot, 100);
-    sync.registerCallback(std::bind(&ImageBoxesCallback,
-                                    &SLAM,
-                                    fire_spots_pub,
-                                    camera_pose_pub,
-                                    std::placeholders::_1,
-                                    std::placeholders::_2));
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image,
+            vision_msgs::msg::Detection2DArray,
+            sensor_msgs::msg::NavSatFix> approximate_policy;
+    message_filters::Synchronizer<approximate_policy> syncApproximate(approximate_policy(100),
+                                                                      sub_image,
+                                                                      sub_fire_spot,
+                                                                      sub_drone_GPS);
+    syncApproximate.setMaxIntervalDuration(rclcpp::Duration(3, 0));
+    syncApproximate.registerCallback(std::bind(&ImageBoxesCallback,
+                                               &SLAM,
+                                               fire_spots_pub,
+                                               camera_pose_pub,
+                                               std::placeholders::_1,
+                                               std::placeholders::_2,
+                                               std::placeholders::_3));
+//    message_filters::TimeSynchronizer<sensor_msgs::msg::Image,
+//            vision_msgs::msg::Detection2DArray,
+//            sensor_msgs::msg::NavSatFix>
+//            sync(sub_image, sub_fire_spot, sub_drone_GPS, 100);
+//    sync.registerCallback(std::bind(&ImageBoxesCallback,
+//                                    &SLAM,
+//                                    fire_spots_pub,
+//                                    camera_pose_pub,
+//                                    std::placeholders::_1,
+//                                    std::placeholders::_2,
+//                                    std::placeholders::_3));
 
     rclcpp::spin(node);
 
