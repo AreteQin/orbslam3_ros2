@@ -9,13 +9,18 @@
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 
-    <depend>rclcpp</depend>
-    <depend>sensor_msgs</depend>
-    <depend>cv_bridge</depend>
-    <depend>message_filters</depend>
+    <exec_depend>rclcpp</exec_depend>
+    <exec_depend>cv_bridge</exec_depend>
+    <exec_depend>image_transport</exec_depend>
+    <exec_depend>sensor_msgs</exec_depend>
+    <exec_depend>geometry_msgs</exec_depend>
+    <exec_depend>visualization_msgs</exec_depend>
+    <exec_depend>tf2_ros</exec_depend>
+    <exec_depend>tf2</exec_depend>
+    <exec_depend>message_filters</exec_depend>
+    <exec_depend>vision_msgs</exec_depend>
+    <exec_depend>opencv</exec_depend>
     <depend>Pangolin</depend>
-    <depend>vision_msgs</depend>
-    <depend>image_transport</depend>
 
     <export>
         <build_type>ament_cmake</build_type>

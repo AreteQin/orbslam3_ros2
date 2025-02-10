@@ -12,5 +12,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/ORB_SLAM3_Ubuntu_20/lib:~/Pangolin/bui
 
 ```Bash
 ros2 run orb_slam3_foxy fire_detection.py
-ros2 run orb_slam3_foxy fire_localization ~/ORB_SLAM3_Ubuntu_20/Vocabulary/ORBvoc.txt ~/foxy_ws/src/orb_slam3_foxy/config/M300.yaml
+## change the path according to the username
+ros2 run orb_slam3_foxy fire_localization /home/qin/ORB_SLAM3_Ubuntu_20/Vocabulary/ORBvoc.txt /home/qin/foxy_ws/src/ORB_SLAM3_foxy/config/M300.yaml
 ```

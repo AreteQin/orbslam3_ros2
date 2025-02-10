@@ -29,7 +29,7 @@ class ImageListener(Node):
             '/bounding_boxes/fire_spots',
             10)
         self.bridge = CvBridge()
-        self.model = YOLO("/home/qin/Downloads/YoloWeights/v8l.pt")
+        self.model = YOLO("/home/qin/Downloads/YoloWeights/best.pt")
         self.get_logger().info('Node has been initialized')
 
     def callback(self, image):

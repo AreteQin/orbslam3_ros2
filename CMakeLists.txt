@@ -17,15 +17,27 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(message_filters REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(vision_msgs REQUIRED)
 find_package(Glog REQUIRED)
 
 find_package(Pangolin REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
+
+# enable drawing plot
+add_subdirectory(third_party/matplotlib-cpp)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/matplotlib-cpp)
+# Find Python headers
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 include_directories(
         include
@@ -43,13 +55,22 @@ add_executable(fire_localization
 )
 ament_target_dependencies(fire_localization
         rclcpp
-        sensor_msgs
-        message_filters
-        vision_msgs
-        image_transport
         cv_bridge
+        image_transport
+        sensor_msgs
+        geometry_msgs
+        visualization_msgs
+        tf2_ros
+        tf2
+        message_filters
+        OpenCV
+        vision_msgs
         ORB_SLAM3
-        Pangolin)
+        Pangolin
+)
+target_link_libraries(fire_localization
+        ${GLOG_LIBRARIES}
+)
 
 add_executable(bounding_box_visualization
         src/bounding_box_visualization.cpp
@@ -60,17 +81,40 @@ ament_target_dependencies(bounding_box_visualization
         message_filters
         vision_msgs
         image_transport
-        cv_bridge)
+        cv_bridge
+)
+
+add_executable(global_localization
+        src/global_localization.cpp
+)
+
+ament_target_dependencies(global_localization
+        rclcpp
+        cv_bridge
+        image_transport
+        sensor_msgs
+        geometry_msgs
+        visualization_msgs
+        tf2_ros
+        tf2
+        message_filters
+        OpenCV
+        vision_msgs
+        Pangolin
+)
+
+target_link_libraries(global_localization
+        matplotlib_cpp
+        ${GLOG_LIBRARIES}
+)
 
 install(TARGETS
         fire_localization
         bounding_box_visualization
-        DESTINATION lib/${PROJECT_NAME})
-target_link_libraries(fire_localization
-        ${GLOG_LIBRARIES}
+        DESTINATION lib/${PROJECT_NAME}
 )
 
-        # Install python scripts.
+# Install python scripts.
 install(PROGRAMS
         scripts/fire_detection.py
         DESTINATION lib/${PROJECT_NAME})
