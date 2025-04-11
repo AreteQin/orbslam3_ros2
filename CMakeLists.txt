@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
-project(orb_slam3_foxy)
+project(orbslam3_ros2)
 
 # You should set the PYTHONPATH to your own python site-packages path
-set(ENV{PYTHONPATH} "/opt/ros/foxy/lib/python3.8/site-packages/")
+#set(ENV{PYTHONPATH} "/opt/ros/foxy/lib/python3.8/site-packages/")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 

@@ -1,8 +1,11 @@
 # ORB_SLAM3_foxy
 
 ## Dependencies
+```Bash
+sudo apt install ros-${ROS_DISTRO}-tf2-sensor-msgs ros-${ROS_DISTRO}-tf2-geometry-msgs
+```
 
-### ORB_SLAM3
+## ORB_SLAM3
 Add the following line to the .bashrc file
 ```Bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/ORB_SLAM3_Ubuntu_20/lib:~/Pangolin/build/:~/ORB_SLAM3_Ubuntu_20/Thirdparty/DBoW2/lib:~/ORB_SLAM3_Ubuntu_20/Thirdparty/g2o/lib

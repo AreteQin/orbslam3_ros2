@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-    <name>orb_slam3_foxy</name>
+    <name>orbslam3_ros2</name>
     <version>1.0.0</version>
     <description>ROS2 wrapper for ORB_SLAM3 library</description>
     <maintainer email="q_qiaome@live.concordia.ca">Qiaomeng Qin</maintainer>
