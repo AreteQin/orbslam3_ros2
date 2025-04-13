@@ -29,8 +29,8 @@ void ImageBoxesCallback(const sensor_msgs::msg::Image::ConstSharedPtr &msg,
     vector<cv::Rect> fire_spots;
     cout << "fire spots number: " << msg_fire_spot->detections.size() << endl;
     for (auto &box: msg_fire_spot->detections) {
-        fire_spots.emplace_back(box.bbox.center.x - box.bbox.size_x / 2,
-                                box.bbox.center.y - box.bbox.size_y / 2,
+        fire_spots.emplace_back(box.bbox.center.position.x - box.bbox.size_x / 2,
+                                box.bbox.center.position.y - box.bbox.size_y / 2,
                                 box.bbox.size_x,
                                 box.bbox.size_y);
     }

@@ -28,6 +28,7 @@ find_package(message_filters REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(vision_msgs REQUIRED)
 find_package(Glog REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 find_package(Pangolin REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
@@ -67,6 +68,7 @@ ament_target_dependencies(fire_localization
         vision_msgs
         ORB_SLAM3
         Pangolin
+        tf2_geometry_msgs
 )
 target_link_libraries(fire_localization
         ${GLOG_LIBRARIES}
@@ -82,6 +84,7 @@ ament_target_dependencies(bounding_box_visualization
         vision_msgs
         image_transport
         cv_bridge
+        OpenCV
 )
 
 add_executable(global_localization
