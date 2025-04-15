@@ -31,7 +31,7 @@ find_package(Glog REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
 find_package(Pangolin REQUIRED)
-find_package(ORB_SLAM3 REQUIRED)
+#find_package(ORB_SLAM3 REQUIRED)
 
 # enable drawing plot
 add_subdirectory(third_party/matplotlib-cpp)
