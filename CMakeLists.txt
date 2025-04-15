@@ -32,6 +32,7 @@ find_package(vision_msgs REQUIRED)
 find_package(Glog REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(Pangolin REQUIRED)
+
 # check ros2 version
 if(DEFINED ENV{ROS_DISTRO})
     message(STATUS "ROS2 Distribution: $ENV{ROS_DISTRO}")
