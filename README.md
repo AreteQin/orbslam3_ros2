@@ -3,6 +3,7 @@
 ## Dependencies
 ```Bash
 sudo apt install ros-${ROS_DISTRO}-tf2-sensor-msgs ros-${ROS_DISTRO}-tf2-geometry-msgs
+pip3 install --upgrade "numpy<2"
 ```
 
 ## ORB_SLAM3
