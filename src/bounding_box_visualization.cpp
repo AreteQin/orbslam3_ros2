@@ -10,6 +10,7 @@
 #include <image_transport/image_transport.hpp>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include "tools.h"
 
 using namespace std;
 
@@ -29,8 +30,8 @@ void ImageBoxesCallback(const sensor_msgs::msg::Image::ConstSharedPtr &msg,
     vector<cv::Rect> fire_spots;
     cout << "fire spots number: " << msg_fire_spot->detections.size() << endl;
     for (auto &box: msg_fire_spot->detections) {
-        fire_spots.emplace_back(box.bbox.center.position.x - box.bbox.size_x / 2,
-                                box.bbox.center.position.y - box.bbox.size_y / 2,
+        fire_spots.emplace_back(getBoxCenterX(box) - box.bbox.size_x / 2,
+                                getBoxCenterY(box) - box.bbox.size_y / 2,
                                 box.bbox.size_x,
                                 box.bbox.size_y);
     }

@@ -6,12 +6,14 @@ sudo apt install -y ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-tf2-sensor-m
 pip3 install --upgrade "numpy<2"
 ```
 
-G2O
+ORB_SLAM3:
 
-## ORB_SLAM3
-Add the following line to the .bashrc file
-```Bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/ORB_SLAM3_Ubuntu_20/lib:~/Pangolin/build/:~/ORB_SLAM3_Ubuntu_20/Thirdparty/DBoW2/lib:~/ORB_SLAM3_Ubuntu_20/Thirdparty/g2o/lib
+Modify the `FindORB_SLAM3.cmake` file in the `CMakeModules` directory to point to the correct path of the ORB_SLAM3 library.
+
+```CMake
+# To help the search ORB_SLAM3_ROOT_DIR environment variable as the path to ORB_SLAM3 root folder
+#  e.g. `set( ORB_SLAM3_ROOT_DIR "Path/to/ORB_SLAM3") `
+set(ORB_SLAM3_ROOT_DIR "~/ORB_SLAM3_Ubuntu_20")
 ```
 
 ## Usage

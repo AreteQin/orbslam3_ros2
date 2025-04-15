@@ -46,6 +46,7 @@
 #include "MapPoint.h"
 #include "System.h"
 #include "Map.h"
+#include "tools.h"
 
 using namespace std;
 
@@ -128,8 +129,8 @@ void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
     // Convert Detection2DArray to a vector of cv::Rect.
     vector<cv::Rect> fire_spots;
     for (auto &box: msg_fire_spot->detections) {
-        fire_spots.emplace_back(static_cast<int>(box.bbox.center.position.x - box.bbox.size_x / 2),
-                                static_cast<int>(box.bbox.center.position.y - box.bbox.size_y / 2),
+        fire_spots.emplace_back(static_cast<int>(getBoxCenterX(box) - box.bbox.size_x / 2),
+                                static_cast<int>(getBoxCenterY(box) - box.bbox.size_y / 2),
                                 static_cast<int>(box.bbox.size_x),
                                 static_cast<int>(box.bbox.size_y));
     }
