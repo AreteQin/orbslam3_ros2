@@ -49,8 +49,8 @@ class ImageListener(Node):
                     ros_box.header = image.header
                     ros_box.bbox.size_x = float(x2 - x1)
                     ros_box.bbox.size_y = float(y2 - y1)
-                    ros_box.bbox.center.x = float((x1 + x2) / 2)
-                    ros_box.bbox.center.y = float((y1 + y2) / 2)
+                    ros_box.bbox.center.position.x = float((x1 + x2) / 2)
+                    ros_box.bbox.center.position.y = float((y1 + y2) / 2)
                     ros_box.bbox.center.theta = float(0)
                     ros_boxes.detections.append(ros_box)
                 self.publisher.publish(ros_boxes)

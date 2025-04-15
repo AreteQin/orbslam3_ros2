@@ -114,6 +114,7 @@ target_link_libraries(global_localization
 install(TARGETS
         fire_localization
         bounding_box_visualization
+        global_localization
         DESTINATION lib/${PROJECT_NAME}
 )
 
