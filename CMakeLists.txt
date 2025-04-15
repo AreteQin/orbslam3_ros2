@@ -38,9 +38,9 @@ if(DEFINED ENV{ROS_DISTRO})
 else()
     message(WARNING "ROS_DISTRO is not defined. Be sure to source your ROS2 setup file!")
 endif()
-IF ($ENV{ROS_DISTRO} STREQUAL "humble")
+#IF ($ENV{ROS_DISTRO} STREQUAL "humble")
     find_package(ORB_SLAM3 REQUIRED)
-ENDIF ()
+#ENDIF ()
 
 # enable drawing plot
 add_subdirectory(third_party/matplotlib-cpp)
