@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 project(orbslam3_ros2)
 
 # You should set the PYTHONPATH to your own python site-packages path
-#set(ENV{PYTHONPATH} "/opt/ros/foxy/lib/python3.8/site-packages/")
+IF ($ENV{ROS_DISTRO} STREQUAL "foxy")
+    set(ENV{PYTHONPATH} "/opt/ros/foxy/lib/python3.8/site-packages/")
+ENDIF ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
@@ -29,9 +31,16 @@ find_package(OpenCV REQUIRED)
 find_package(vision_msgs REQUIRED)
 find_package(Glog REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-
 find_package(Pangolin REQUIRED)
-#find_package(ORB_SLAM3 REQUIRED)
+# check ros2 version
+if(DEFINED ENV{ROS_DISTRO})
+    message(STATUS "ROS2 Distribution: $ENV{ROS_DISTRO}")
+else()
+    message(WARNING "ROS_DISTRO is not defined. Be sure to source your ROS2 setup file!")
+endif()
+IF ($ENV{ROS_DISTRO} STREQUAL "humble")
+    find_package(ORB_SLAM3 REQUIRED)
+ENDIF ()
 
 # enable drawing plot
 add_subdirectory(third_party/matplotlib-cpp)
