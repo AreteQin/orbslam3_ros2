@@ -1,4 +1,5 @@
 # ORB_SLAM3_foxy
+Tested with ROS2 Foxy and Humble
 
 ## Dependencies
 ```Bash
