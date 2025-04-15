@@ -22,6 +22,7 @@
     <exec_depend>opencv</exec_depend>
     <exec_depend>tf2_geometry_msgs</exec_depend>
     <depend>Pangolin</depend>
+    <depend>ORB_SLAM3</depend>
 
     <export>
         <build_type>ament_cmake</build_type>
