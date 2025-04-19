@@ -1,5 +1,5 @@
 # ORBSLAM3_ROS2
-Tested with ROS2 Foxy and Humble
+Based on ORB_SLAM3_OpenCV4. Tested with ROS2 Foxy and Humble
 
 ## Dependencies
 ```Bash
@@ -7,7 +7,14 @@ sudo apt install -y ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-tf2-sensor-m
 pip3 install --upgrade "numpy<2"
 ```
 
-ORB_SLAM3:
+### ORB_SLAM3:
+
+Download the ORB_SLAM3_OpenCV4 repository and build it:
+```Bash
+git clone https://github.com/AreteQin/ORB_SLAM3_OpenCV4.git
+cd ORB_SLAM3_OpenCV4
+bash ./build.sh
+```
 
 Modify the `FindORB_SLAM3.cmake` file in the `CMakeModules` directory to point to the correct path of the ORB_SLAM3 library.
 
@@ -16,6 +23,11 @@ Modify the `FindORB_SLAM3.cmake` file in the `CMakeModules` directory to point t
 #  e.g. `set( ORB_SLAM3_ROOT_DIR "Path/to/ORB_SLAM3") `
 set(ORB_SLAM3_ROOT_DIR "~/ORB_SLAM3_OpenCV4")
 ```
+
+Run the following command to add libs' path into your `~/.bashrc` file:
+```Bash
+echo "export LD_LIBRARY_PATH=~/ORB_SLAM3_OpenCV4/lib:~/ORB_SLAM3_OpenCV4/Thirdparty/DBoW2/lib:~/ORB_SLAM3_OpenCV4/Thirdparty/g2o/lib:\$LD_LIBRARY_PATH" >>~/.bashrc
+````
 
 ## Usage
 

@@ -28,10 +28,6 @@
 // Image transport (only used for initialization here)
 #include <image_transport/image_transport.hpp>
 
-// Message filters (we use these for synchronization)
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
-
 // TF2 (transforms)
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -56,59 +52,7 @@ visualization_msgs::msg::Marker drone_model;
  */
 sensor_msgs::msg::PointCloud2 convertMapPointsToPointCloud2(
     const std::vector<ORB_SLAM3::MapPoint*>& mapPoints,
-    const std_msgs::msg::Header& header)
-{
-    sensor_msgs::msg::PointCloud2 pointCloudMsg;
-    pointCloudMsg.header = header;
-    pointCloudMsg.height = 1;
-    pointCloudMsg.width = mapPoints.size();
-    pointCloudMsg.is_dense = false;
-    pointCloudMsg.is_bigendian = false;
-
-    // Set up the fields: x, y, z.
-    pointCloudMsg.fields.resize(3);
-    pointCloudMsg.fields[0].name = "x";
-    pointCloudMsg.fields[0].offset = 0;
-    pointCloudMsg.fields[0].datatype = sensor_msgs::msg::PointField::FLOAT32;
-    pointCloudMsg.fields[0].count = 1;
-
-    pointCloudMsg.fields[1].name = "y";
-    pointCloudMsg.fields[1].offset = 4;
-    pointCloudMsg.fields[1].datatype = sensor_msgs::msg::PointField::FLOAT32;
-    pointCloudMsg.fields[1].count = 1;
-
-    pointCloudMsg.fields[2].name = "z";
-    pointCloudMsg.fields[2].offset = 8;
-    pointCloudMsg.fields[2].datatype = sensor_msgs::msg::PointField::FLOAT32;
-    pointCloudMsg.fields[2].count = 1;
-
-    pointCloudMsg.point_step = 3 * sizeof(float);
-    pointCloudMsg.row_step = pointCloudMsg.point_step * pointCloudMsg.width;
-    pointCloudMsg.data.resize(pointCloudMsg.row_step * pointCloudMsg.height);
-
-    sensor_msgs::PointCloud2Iterator<float> iter_x(pointCloudMsg, "x");
-    sensor_msgs::PointCloud2Iterator<float> iter_y(pointCloudMsg, "y");
-    sensor_msgs::PointCloud2Iterator<float> iter_z(pointCloudMsg, "z");
-
-    for (const auto& mapPoint : mapPoints)
-    {
-        if (mapPoint && !mapPoint->isBad())
-        {
-            const Eigen::Vector3f& pos = mapPoint->GetWorldPos();
-            *iter_x = pos.x();
-            *iter_y = pos.y();
-            *iter_z = pos.z();
-        }
-        else
-        {
-            *iter_x = *iter_y = *iter_z = std::numeric_limits<float>::quiet_NaN();
-        }
-        ++iter_x;
-        ++iter_y;
-        ++iter_z;
-    }
-    return pointCloudMsg;
-}
+    const std_msgs::msg::Header& header);
 
 /**
  * @brief Callback for synchronized image and detection messages.
@@ -236,30 +180,18 @@ int main(int argc, char** argv)
     auto node = rclcpp::Node::make_shared("fire_localization");
     node->declare_parameter<std::string>("image_transport", "compressed");
 
-    // Since image_transport::SubscriberFilter is not available in Foxy,
-    // we use message_filters::Subscriber for sensor_msgs::msg::Image.
-    message_filters::Subscriber<sensor_msgs::msg::Image> sub_image(node.get(), "/dji_osdk_ros/main_wide_RGB",
-                                                                   rmw_qos_profile_default);
-    message_filters::Subscriber<vision_msgs::msg::Detection2DArray> sub_fire_spot(
-        node.get(), "/bounding_boxes/fire_spots", rmw_qos_profile_default);
-
-    auto fire_spots_pub = node->create_publisher<geometry_msgs::msg::PoseArray>("/position/fire_spots", 10);
     auto point_cloud_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>("/point_cloud", 10);
     auto marker_pub = node->create_publisher<visualization_msgs::msg::Marker>("/visualization_marker/drone", 10);
 
     auto tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(node);
 
-    // Use TimeSynchronizer to synchronize the image and detection messages.
-    message_filters::TimeSynchronizer<sensor_msgs::msg::Image, vision_msgs::msg::Detection2DArray> sync(
-        sub_image, sub_fire_spot, 10);
-    sync.registerCallback(std::bind(&ImageBoxesCallback,
-                                    &SLAM,
-                                    fire_spots_pub,
-                                    tf_broadcaster.get(),
-                                    point_cloud_pub,
-                                    marker_pub,
-                                    std::placeholders::_1,
-                                    std::placeholders::_2));
+    // subscribe to <sensor_msgs::msg::Image> "/dji_osdk_ros/main_wide_RGB"
+    auto image_sub = node->create_subscription<sensor_msgs::msg::Image>(
+        "/dji_osdk_ros/main_wide_RGB", 10,
+        [&, tf_broadcaster, point_cloud_pub, marker_pub](const sensor_msgs::msg::Image::ConstSharedPtr& msg)
+        {
+            ImageBoxesCallback(&SLAM, tf_broadcaster.get(), point_cloud_pub, marker_pub, msg);
+        });
 
     rclcpp::spin(node);
 
@@ -268,4 +200,60 @@ int main(int argc, char** argv)
 
     rclcpp::shutdown();
     return 0;
+}
+
+sensor_msgs::msg::PointCloud2 convertMapPointsToPointCloud2(
+    const std::vector<ORB_SLAM3::MapPoint*>& mapPoints,
+    const std_msgs::msg::Header& header)
+{
+    sensor_msgs::msg::PointCloud2 pointCloudMsg;
+    pointCloudMsg.header = header;
+    pointCloudMsg.height = 1;
+    pointCloudMsg.width = mapPoints.size();
+    pointCloudMsg.is_dense = false;
+    pointCloudMsg.is_bigendian = false;
+
+    // Set up the fields: x, y, z.
+    pointCloudMsg.fields.resize(3);
+    pointCloudMsg.fields[0].name = "x";
+    pointCloudMsg.fields[0].offset = 0;
+    pointCloudMsg.fields[0].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    pointCloudMsg.fields[0].count = 1;
+
+    pointCloudMsg.fields[1].name = "y";
+    pointCloudMsg.fields[1].offset = 4;
+    pointCloudMsg.fields[1].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    pointCloudMsg.fields[1].count = 1;
+
+    pointCloudMsg.fields[2].name = "z";
+    pointCloudMsg.fields[2].offset = 8;
+    pointCloudMsg.fields[2].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    pointCloudMsg.fields[2].count = 1;
+
+    pointCloudMsg.point_step = 3 * sizeof(float);
+    pointCloudMsg.row_step = pointCloudMsg.point_step * pointCloudMsg.width;
+    pointCloudMsg.data.resize(pointCloudMsg.row_step * pointCloudMsg.height);
+
+    sensor_msgs::PointCloud2Iterator<float> iter_x(pointCloudMsg, "x");
+    sensor_msgs::PointCloud2Iterator<float> iter_y(pointCloudMsg, "y");
+    sensor_msgs::PointCloud2Iterator<float> iter_z(pointCloudMsg, "z");
+
+    for (const auto& mapPoint : mapPoints)
+    {
+        if (mapPoint && !mapPoint->isBad())
+        {
+            const Eigen::Vector3f& pos = mapPoint->GetWorldPos();
+            *iter_x = pos.x();
+            *iter_y = pos.y();
+            *iter_z = pos.z();
+        }
+        else
+        {
+            *iter_x = *iter_y = *iter_z = std::numeric_limits<float>::quiet_NaN();
+        }
+        ++iter_x;
+        ++iter_y;
+        ++iter_z;
+    }
+    return pointCloudMsg;
 }
