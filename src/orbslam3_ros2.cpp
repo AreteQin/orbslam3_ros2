@@ -114,12 +114,10 @@ sensor_msgs::msg::PointCloud2 convertMapPointsToPointCloud2(
  * @brief Callback for synchronized image and detection messages.
  */
 void ImageBoxesCallback(ORB_SLAM3::System* pSLAM,
-                        const std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseArray>> fire_spots_pub,
                         tf2_ros::TransformBroadcaster* tf_broadcaster,
                         const std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> point_cloud_pub,
                         const std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::Marker>> marker_pub,
-                        const sensor_msgs::msg::Image::ConstSharedPtr& msg,
-                        const vision_msgs::msg::Detection2DArray::ConstSharedPtr& msg_fire_spot)
+                        const sensor_msgs::msg::Image::ConstSharedPtr& msg)
 {
     // Convert image to cv::Mat.
     cv_bridge::CvImageConstPtr cv_ptr;
@@ -133,35 +131,11 @@ void ImageBoxesCallback(ORB_SLAM3::System* pSLAM,
         return;
     }
 
-    // Convert Detection2DArray to a vector of cv::Rect.
-    vector<cv::Rect> fire_spots;
-    for (auto& box : msg_fire_spot->detections)
-    {
-        fire_spots.emplace_back(static_cast<int>(getBoxCenterX(box) - box.bbox.size_x / 2),
-                                static_cast<int>(getBoxCenterY(box) - box.bbox.size_y / 2),
-                                static_cast<int>(box.bbox.size_x),
-                                static_cast<int>(box.bbox.size_y));
-    }
-
     double timestamp = rclcpp::Time(cv_ptr->header.stamp).seconds();
-    pSLAM->TrackMonocularAndFire(cv_ptr->image, timestamp, fire_spots);
+    pSLAM->TrackMonocular(cv_ptr->image, timestamp);
     ORB_SLAM3::Map* current_map = pSLAM->GetAtlas()->GetCurrentMap();
     if (!current_map)
         return;
-
-    // Publish fire spots.
-    geometry_msgs::msg::PoseArray fire_spots_msg;
-    fire_spots_msg.header.stamp = msg->header.stamp;
-    fire_spots_msg.header.frame_id = "map";
-    for (Eigen::Vector3f& fire_spot : current_map->mvFireSpots)
-    {
-        geometry_msgs::msg::Pose pose;
-        pose.position.x = fire_spot[0];
-        pose.position.y = fire_spot[1];
-        pose.position.z = fire_spot[2];
-        fire_spots_msg.poses.push_back(pose);
-    }
-    fire_spots_pub->publish(fire_spots_msg);
 
     // Publish the camera pose as a TF transform.
     geometry_msgs::msg::TransformStamped camera_pose_msg;

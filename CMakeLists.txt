@@ -48,14 +48,6 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
 
-
-# enable drawing plot
-add_subdirectory(third_party/matplotlib-cpp)
-include_directories(${PROJECT_SOURCE_DIR}/third_party/matplotlib-cpp)
-# Find Python headers
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-
 include_directories(
         include
         ${ORB_SLAM3_ROOT_DIR}/include
@@ -67,11 +59,11 @@ link_directories(
         include
 )
 
-add_executable(fire_localization
-        src/fire_localization.cpp
+add_executable(orbslam3_ros2
+        src/orbslam3_ros2.cpp
         src/tools.h
 )
-ament_target_dependencies(fire_localization
+ament_target_dependencies(orbslam3_ros2
         rclcpp
         cv_bridge
         image_transport
@@ -87,60 +79,14 @@ ament_target_dependencies(fire_localization
         Pangolin
         tf2_geometry_msgs
 )
-target_link_libraries(fire_localization
-        ${GLOG_LIBRARIES}
-)
-
-add_executable(bounding_box_visualization
-        src/bounding_box_visualization.cpp
-        src/tools.h
-)
-ament_target_dependencies(bounding_box_visualization
-        rclcpp
-        sensor_msgs
-        message_filters
-        vision_msgs
-        image_transport
-        cv_bridge
-        OpenCV
-)
-
-add_executable(global_localization
-        src/global_localization.cpp
-        src/tools.h
-)
-
-ament_target_dependencies(global_localization
-        rclcpp
-        cv_bridge
-        image_transport
-        sensor_msgs
-        geometry_msgs
-        visualization_msgs
-        tf2_ros
-        tf2
-        message_filters
-        OpenCV
-        vision_msgs
-        Pangolin
-)
-
-target_link_libraries(global_localization
-        matplotlib_cpp
+target_link_libraries(orbslam3_ros2
         ${GLOG_LIBRARIES}
 )
 
 install(TARGETS
-        fire_localization
-        bounding_box_visualization
-        global_localization
+        orbslam3_ros2
         DESTINATION lib/${PROJECT_NAME}
 )
-
-# Install python scripts.
-install(PROGRAMS
-        scripts/fire_detection.py
-        DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
 #install(DIRECTORY launch config vocabulary

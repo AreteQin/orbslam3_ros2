@@ -1,4 +1,4 @@
-# ORB_SLAM3_foxy
+# ORBSLAM3_ROS2
 Tested with ROS2 Foxy and Humble
 
 ## Dependencies
