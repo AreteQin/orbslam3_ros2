@@ -14,7 +14,7 @@ Modify the `FindORB_SLAM3.cmake` file in the `CMakeModules` directory to point t
 ```CMake
 # To help the search ORB_SLAM3_ROOT_DIR environment variable as the path to ORB_SLAM3 root folder
 #  e.g. `set( ORB_SLAM3_ROOT_DIR "Path/to/ORB_SLAM3") `
-set(ORB_SLAM3_ROOT_DIR "~/ORB_SLAM3_Ubuntu_20")
+set(ORB_SLAM3_ROOT_DIR "~/ORB_SLAM3_OpenCV4")
 ```
 
 ## Usage
@@ -22,6 +22,11 @@ set(ORB_SLAM3_ROOT_DIR "~/ORB_SLAM3_Ubuntu_20")
 ```Bash
 ros2 run orbslam3_ros2 fire_detection.py
 ## change the path according to the username
-ros2 run orbslam3_ros2 fire_localization /home/qin/ORB_SLAM3_Ubuntu_20/Vocabulary/ORBvoc.txt /home/qin/humble_ws/src/orbslam3_ros2/config/M300.yaml
-ros2 run orbslam3_ros2 fire_localization /home/nvidia/ORB_SLAM3_Ubuntu_20/Vocabulary/ORBvoc.txt /home/nvidia/foxy_ws/src/orbslam3_ros2/config/M300.yaml
+ros2 run orbslam3_ros2 fire_localization /home/qin/ORB_SLAM3_OpenCV4/Vocabulary/ORBvoc.txt /home/qin/humble_ws/src/orbslam3_ros2/config/M300.yaml
+ros2 run orbslam3_ros2 fire_localization /home/nvidia/ORB_SLAM3_OpenCV4/Vocabulary/ORBvoc.txt /home/nvidia/foxy_ws/src/orbslam3_ros2/config/M300.yaml
+```
+
+To visualize the results of ORB-SLAM3 using RViz
+```bash
+roslaunch '/home/qin/ORB_SLAM3_OpenCV4/Examples_old/ROS/ORB_SLAM3/play_bag_and_rviz.launch'
 ```

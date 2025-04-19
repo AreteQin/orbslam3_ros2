@@ -8,8 +8,6 @@
 #include <fstream>
 #include <limits>
 #include <vector>
-
-// ROS 2 core
 #include <rclcpp/rclcpp.hpp>
 
 // OpenCV and cv_bridge
@@ -57,8 +55,9 @@ visualization_msgs::msg::Marker drone_model;
  * @brief Converts a vector of ORB_SLAM3 MapPoints into a sensor_msgs::msg::PointCloud2 message.
  */
 sensor_msgs::msg::PointCloud2 convertMapPointsToPointCloud2(
-    const std::vector<ORB_SLAM3::MapPoint *> &mapPoints,
-    const std_msgs::msg::Header &header) {
+    const std::vector<ORB_SLAM3::MapPoint*>& mapPoints,
+    const std_msgs::msg::Header& header)
+{
     sensor_msgs::msg::PointCloud2 pointCloudMsg;
     pointCloudMsg.header = header;
     pointCloudMsg.height = 1;
@@ -91,13 +90,17 @@ sensor_msgs::msg::PointCloud2 convertMapPointsToPointCloud2(
     sensor_msgs::PointCloud2Iterator<float> iter_y(pointCloudMsg, "y");
     sensor_msgs::PointCloud2Iterator<float> iter_z(pointCloudMsg, "z");
 
-    for (const auto &mapPoint: mapPoints) {
-        if (mapPoint && !mapPoint->isBad()) {
-            const Eigen::Vector3f &pos = mapPoint->GetWorldPos();
+    for (const auto& mapPoint : mapPoints)
+    {
+        if (mapPoint && !mapPoint->isBad())
+        {
+            const Eigen::Vector3f& pos = mapPoint->GetWorldPos();
             *iter_x = pos.x();
             *iter_y = pos.y();
             *iter_z = pos.z();
-        } else {
+        }
+        else
+        {
             *iter_x = *iter_y = *iter_z = std::numeric_limits<float>::quiet_NaN();
         }
         ++iter_x;
@@ -110,25 +113,30 @@ sensor_msgs::msg::PointCloud2 convertMapPointsToPointCloud2(
 /**
  * @brief Callback for synchronized image and detection messages.
  */
-void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
-                        const std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseArray> > fire_spots_pub,
-                        tf2_ros::TransformBroadcaster *tf_broadcaster,
-                        const std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2> > point_cloud_pub,
-                        const std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::Marker> > marker_pub,
-                        const sensor_msgs::msg::Image::ConstSharedPtr &msg,
-                        const vision_msgs::msg::Detection2DArray::ConstSharedPtr &msg_fire_spot) {
+void ImageBoxesCallback(ORB_SLAM3::System* pSLAM,
+                        const std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::PoseArray>> fire_spots_pub,
+                        tf2_ros::TransformBroadcaster* tf_broadcaster,
+                        const std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> point_cloud_pub,
+                        const std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::Marker>> marker_pub,
+                        const sensor_msgs::msg::Image::ConstSharedPtr& msg,
+                        const vision_msgs::msg::Detection2DArray::ConstSharedPtr& msg_fire_spot)
+{
     // Convert image to cv::Mat.
     cv_bridge::CvImageConstPtr cv_ptr;
-    try {
+    try
+    {
         cv_ptr = cv_bridge::toCvShare(msg);
-    } catch (cv_bridge::Exception &e) {
+    }
+    catch (cv_bridge::Exception& e)
+    {
         RCLCPP_ERROR(rclcpp::get_logger("fire_localization"), "cv_bridge exception: %s", e.what());
         return;
     }
 
     // Convert Detection2DArray to a vector of cv::Rect.
     vector<cv::Rect> fire_spots;
-    for (auto &box: msg_fire_spot->detections) {
+    for (auto& box : msg_fire_spot->detections)
+    {
         fire_spots.emplace_back(static_cast<int>(getBoxCenterX(box) - box.bbox.size_x / 2),
                                 static_cast<int>(getBoxCenterY(box) - box.bbox.size_y / 2),
                                 static_cast<int>(box.bbox.size_x),
@@ -137,7 +145,7 @@ void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
 
     double timestamp = rclcpp::Time(cv_ptr->header.stamp).seconds();
     pSLAM->TrackMonocularAndFire(cv_ptr->image, timestamp, fire_spots);
-    ORB_SLAM3::Map *current_map = pSLAM->GetAtlas()->GetCurrentMap();
+    ORB_SLAM3::Map* current_map = pSLAM->GetAtlas()->GetCurrentMap();
     if (!current_map)
         return;
 
@@ -145,7 +153,8 @@ void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
     geometry_msgs::msg::PoseArray fire_spots_msg;
     fire_spots_msg.header.stamp = msg->header.stamp;
     fire_spots_msg.header.frame_id = "map";
-    for (Eigen::Vector3f &fire_spot: current_map->mvFireSpots) {
+    for (Eigen::Vector3f& fire_spot : current_map->mvFireSpots)
+    {
         geometry_msgs::msg::Pose pose;
         pose.position.x = fire_spot[0];
         pose.position.y = fire_spot[1];
@@ -187,8 +196,9 @@ void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
     tf_broadcaster->sendTransform(map_transform);
 
     // Publish the map points as a PointCloud2.
-    const vector<ORB_SLAM3::MapPoint *> &vpMPs = current_map->GetAllMapPoints();
-    if (!vpMPs.empty()) {
+    const vector<ORB_SLAM3::MapPoint*>& vpMPs = current_map->GetAllMapPoints();
+    if (!vpMPs.empty())
+    {
         sensor_msgs::msg::PointCloud2 point_cloud_msg;
         point_cloud_msg.header.stamp = msg->header.stamp;
         point_cloud_msg.header.frame_id = "map";
@@ -202,11 +212,14 @@ void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
     drone_model.ns = "fbx_marker";
     drone_model.id = 0;
     drone_model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-    if (std::ifstream("/home/qin/ORB_SLAM3_Ubuntu_20/drone.dae")) {
-        drone_model.mesh_resource = "file:///home/qin/ORB_SLAM3_Ubuntu_20/drone.dae";
-    } else {
+    if (std::ifstream("/home/qin/ORB_SLAM3_OpenCV4/drone.dae"))
+    {
+        drone_model.mesh_resource = "file:///home/qin/ORB_SLAM3_OpenCV4/drone.dae";
+    }
+    else
+    {
         RCLCPP_ERROR(rclcpp::get_logger("fire_localization"),
-                     "Mesh resource file not found: /home/qin/ORB_SLAM3_Ubuntu_20/drone.dae");
+                     "Mesh resource file not found: /home/qin/ORB_SLAM3_OpenCV4/drone.dae");
     }
     drone_model.action = visualization_msgs::msg::Marker::ADD;
     drone_model.pose.position.x = 0.0;
@@ -231,12 +244,14 @@ void ImageBoxesCallback(ORB_SLAM3::System *pSLAM,
     marker_pub->publish(drone_model);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
     rclcpp::init(argc, argv);
 
-    if (argc != 3) {
+    if (argc != 3)
+    {
         std::cerr << "Usage: ros2 run <package_name> fire_localization path_to_vocabulary path_to_settings" <<
-                std::endl;
+            std::endl;
         rclcpp::shutdown();
         return 1;
     }
