@@ -4,7 +4,6 @@ Based on ORB_SLAM3_OpenCV4. Tested with ROS2 Foxy and Humble
 ## Dependencies
 ```Bash
 sudo apt install -y ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-tf2-sensor-msgs ros-${ROS_DISTRO}-tf2-geometry-msgs
-pip3 install --upgrade "numpy<2"
 ```
 
 ### ORB_SLAM3:

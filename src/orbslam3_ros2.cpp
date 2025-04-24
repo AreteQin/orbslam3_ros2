@@ -123,43 +123,6 @@ void ImageBoxesCallback(ORB_SLAM3::System* pSLAM,
         point_cloud_msg = convertMapPointsToPointCloud2(vpMPs, point_cloud_msg.header);
         point_cloud_pub->publish(point_cloud_msg);
     }
-
-    // Publish a Marker representing the drone model.
-    drone_model.header.frame_id = "H20T";
-    drone_model.header.stamp = msg->header.stamp;
-    drone_model.ns = "fbx_marker";
-    drone_model.id = 0;
-    drone_model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-    if (std::ifstream("/home/qin/ORB_SLAM3_OpenCV4/drone.dae"))
-    {
-        drone_model.mesh_resource = "file:///home/qin/ORB_SLAM3_OpenCV4/drone.dae";
-    }
-    else
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("fire_localization"),
-                     "Mesh resource file not found: /home/qin/ORB_SLAM3_OpenCV4/drone.dae");
-    }
-    drone_model.action = visualization_msgs::msg::Marker::ADD;
-    drone_model.pose.position.x = 0.0;
-    drone_model.pose.position.y = -0.2;
-    drone_model.pose.position.z = -0.5;
-    drone_model.color.r = 0.5f;
-    drone_model.color.g = 0.5f;
-    drone_model.color.b = 0.5f;
-    drone_model.color.a = 1.0f;
-    drone_model.scale.x = 0.1;
-    drone_model.scale.y = 0.1;
-    drone_model.scale.z = 0.1;
-
-    tf2::Quaternion quaternion;
-    quaternion.setRPY(1.0, 3.14, 0.0);
-    geometry_msgs::msg::Quaternion q_msg;
-    q_msg.x = quaternion.x();
-    q_msg.y = quaternion.y();
-    q_msg.z = quaternion.z();
-    q_msg.w = quaternion.w();
-    drone_model.pose.orientation = q_msg;
-    marker_pub->publish(drone_model);
 }
 
 int main(int argc, char** argv)
